@@ -1,122 +1,40 @@
 ---
-title: "EXAMPLE_TITLE"
-author: "YOUR_NAME"
-date: "6/12/2020"
+title: "Life Expectancy Report"
 output: html_document
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-## Second Level Header
-This is just plain markdown that can contain **bold** or _italics_.
-
-```{r}
-# R code chunk in an R Markdown file
-some_variable <- 100
+```{r setup, include = FALSE}
+# Load results from the analysis
+# errors and messages will not be printed because of the `include = FALSE` option
+source("analysis.R")
+# Also load additional libraries that may be needed for output
+library("knitr")
 ```
 
-Write normal **markdown** out here, then create a code block:
+## Overview
+This is a brief report regarding life expectancy for each country from
+1960 to 2015 ([source](https://data.worldbank.org/indicator/SP.DYN.LE00.IN)).
+The data reveals that the country with the longest life expectancy was
+`r longest_le$Country.Name`, with a life expectancy of `r longest_le$expectancy`.
+That life expectancy was `r le_difference` years longer than the life expectancy
+in `r shortest_le$Country.Name`.
+Here are the countries whose life expectancy **improved the most** since 1960.
 
-```{r}
-# Execute R code in here
-course_number <- 201
+```{r top_10_gain, echo = FALSE}
+# Show the top 10 table (specifying the column names to display)
+kable(top_10_gain, col.names = c("Country", "Change in Life Expectancy"))
 ```
 
-Back to writing _markdown_ out here.
+## Life Expectancy in 2015
+To identify geographic variations in life expectancy,
+here is a choropleth map of life expectancy in 2015:
 
-```{r options_example, echo = FALSE, message = TRUE}
-# A code chunk named "options_example", with argument `echo` assigned FALSE
-# and argument `message` assigned TRUE
-course_number
-# Would execute R code in here
-```
-
-To calculate 4 + 5 inside some text, you can use `r 4 + 5` right in the _middle_.
-
-
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
-
-```{r raw_print_example, echo = FALSE}
-print("Hello world")
-```
-
-```{r stored_print_example, echo = FALSE}
-msg <- "**Hello world**"
-```
-
-Below is the message to see:
-
-`r msg`
-
-```{r asis_example, results = "asis", echo = TRUE}
-cat("**Hello world**")
-```
-
-```{r list_example, echo = FALSE}
-markdown_list <- "
-- Lions
-- Tigers
-- Bears
-- Oh mys
-"
-```
-
-`r markdown_list`
-
-```{r pasted_list_example, echo = FALSE}
-# Create a vector of animals
-animals <- c("Lions", "Tigers", "Bears", "Oh mys")
-
-# Paste `-` in front of each animal and join the items together with
-# newlines between
-markdown_list <- paste("-", animals, collapse = "\n")
-```
-
-`r markdown_list`
-
-```{r kable_example, echo = FALSE}
-library("knitr") # make sure you load the package (once per document)
-
-# Make a data frame
-letters <- c("a", "b", "c", "d")
-numbers <- 1:4
-df <- data.frame(letters = letters, numbers = numbers)
-
-# "Return the table df
-df
-
-# "Return" the table to render it
-kable(df)
-```
-
-## ggplot2
-```{r plot_example, echo = FALSE}
-library("ggplot2") # make sure you load the package (once per document)
-
-# Plot of college education vs. poverty rates in the Midwest
-ggplot(data = midwest) +
-  geom_point(
-    mapping = aes(x = percollege, y = percadultpoverty, color = state)
-  ) +
-  scale_color_brewer(palette = "Set3")
+```{r le_map, echo = FALSE}
+# Create and render a world map using the `rworldmap` package
+mapCountryData(
+  mapped_data, # indicate the data to map
+  mapTitle = "Life Expectancy in 2015",
+  nameColumnToPlot = "X2015",
+  addLegend = F, # exclude the legend
+  colourPalette = brewer.pal(7, "Blues") # set the color palette
+)
 ```
